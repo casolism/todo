@@ -15,4 +15,13 @@ public class TaskStore
         _tasks.Add(task);
         return task;
     }
+
+    public TaskItem? ToggleCompleted(int id)
+    {
+        var task = _tasks.FirstOrDefault(t => t.Id == id);
+        if (task is null) return null;
+
+        task.Completed = !task.Completed;
+        return task;
+    }
 }
