@@ -66,6 +66,12 @@ export class TaskListComponent implements OnInit {
     return this.totalCount === 0 ? 0 : Math.round((this.doneCount / this.totalCount) * 100);
   }
 
+  get emptyStateTitle(): string {
+    return this.totalCount === 0
+      ? 'No hay tareas para esta semana'
+      : 'No hay tareas que coincidan con el filtro';
+  }
+
   get visibleTasks(): Task[] {
     switch (this.activeFilter) {
       case 'pendientes':
