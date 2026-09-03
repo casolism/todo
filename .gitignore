@@ -1,6 +1,7 @@
 # .NET
 backend/**/bin/
 backend/**/obj/
+backend/**/TestResults/
 *.user
 
 # Node / Angular
@@ -9,8 +10,15 @@ frontend/dist/
 frontend/.angular/
 npm-debug.log*
 
+# Secrets / entornos locales
+.env
+.env.local
+*.env.local
+
 # Editors / OS
 .vs/
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+desktop.ini
