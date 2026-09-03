@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Task } from '../models/task';
+
+export type TaskFilter = 'todas' | 'pendientes' | 'completadas';
 import { TaskService } from '../task.service';
 import { addWeeks, formatWeekRange, isoWeekNumber, mondayOf, toIsoDate } from '../date-utils';
 
@@ -14,6 +16,8 @@ import { addWeeks, formatWeekRange, isoWeekNumber, mondayOf, toIsoDate } from '.
 export class TaskListComponent implements OnInit {
   tasks: Task[] = [];
   currentWeekStart: Date = mondayOf(new Date());
+  activeFilter: TaskFilter = 'todas';
+  readonly filters: TaskFilter[] = ['todas', 'pendientes', 'completadas'];
 
   constructor(private taskService: TaskService) {}
 
@@ -47,6 +51,25 @@ export class TaskListComponent implements OnInit {
 
   get progressPercent(): number {
     return this.totalCount === 0 ? 0 : Math.round((this.doneCount / this.totalCount) * 100);
+  }
+
+  get visibleTasks(): Task[] {
+    switch (this.activeFilter) {
+      case 'pendientes':
+        return this.tasks.filter((t) => !t.completed);
+      case 'completadas':
+        return this.tasks.filter((t) => t.completed);
+      default:
+        return this.tasks;
+    }
+  }
+
+  setFilter(filter: TaskFilter): void {
+    this.activeFilter = filter;
+  }
+
+  filterLabel(filter: TaskFilter): string {
+    return { todas: 'Todas', pendientes: 'Pendientes', completadas: 'Completadas' }[filter];
   }
 
   loadTasks(): void {

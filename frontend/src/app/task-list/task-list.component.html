@@ -26,10 +26,22 @@
         <div class="progress-fill" [style.width.%]="progressPercent"></div>
       </div>
     </div>
+
+    <div class="filters">
+      <button
+        type="button"
+        *ngFor="let filter of filters"
+        class="filter-pill"
+        [class.active]="activeFilter === filter"
+        (click)="setFilter(filter)"
+      >
+        {{ filterLabel(filter) }}
+      </button>
+    </div>
   </div>
 
   <ul class="task-list">
-    <li *ngFor="let task of tasks" [class.completed]="task.completed">
+    <li *ngFor="let task of visibleTasks" [class.completed]="task.completed">
       <input
         type="checkbox"
         [checked]="task.completed"
