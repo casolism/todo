@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+/* Paleta y tipografía — ver design-notes.md */
+:root {
+  --color-bg: #f3f6f3;
+  --color-surface: #fff;
+  --color-surface-alt: #fafcfa;
+  --color-border: #e3eae5;
+  --color-border-soft: #eaf0eb;
+  --color-border-soft-2: #eff4f0;
+  --color-text: #1c2622;
+  --color-text-secondary: #495650;
+  --color-text-tertiary: #7d8a84;
+  --color-accent: #2f9575;
+  --color-accent-hover: #237558;
+  --color-badge-bg: #e4f2ea;
+  --color-danger: #b4453c;
+  --color-danger-hover: #94352d;
+  --color-row-hover: #f8fbf8;
+  --color-priority-alta: #b4453c;
+  --color-priority-media: #b5852f;
+  --color-priority-baja: #7d9a8f;
+
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
