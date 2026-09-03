@@ -17,10 +17,11 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the app title', () => {
+  it('should render the app title via app-task-list', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('TODO App semanal');
+    expect(compiled.querySelector('app-task-list')).not.toBeNull();
+    expect(compiled.querySelector('h1')?.textContent).toContain('Tareas de la semana');
   });
 });

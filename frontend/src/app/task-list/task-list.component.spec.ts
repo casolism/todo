@@ -62,24 +62,52 @@ describe('TaskListComponent', () => {
     expect(checkbox.checked).toBeTrue();
   });
 
-  it('should call POST (addTask) and add the new task to the list on submit', () => {
-    taskServiceSpy.addTask.and.returnValue(
-      of({ id: 3, description: 'Regar las plantas', completed: false, priority: 'media', weekStart: thisWeek })
-    );
+  it('should open the modal from the header button, and not call addTask before confirming', () => {
+    expect(fixture.nativeElement.querySelector('.modal-overlay')).toBeNull();
 
-    const input: HTMLInputElement = fixture.nativeElement.querySelector('input[type="text"]');
-    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
-    input.value = 'Regar las plantas';
-    input.dispatchEvent(new Event('input'));
-    form.dispatchEvent(new Event('submit'));
+    const openButton: HTMLButtonElement = fixture.nativeElement.querySelector('.app-header .btn-primary');
+    openButton.click();
     fixture.detectChanges();
 
-    expect(taskServiceSpy.addTask).toHaveBeenCalledWith('Regar las plantas', 'media', thisWeek);
-    expect(fixture.componentInstance.tasks.length).toBe(3);
+    expect(fixture.nativeElement.querySelector('.modal-overlay')).not.toBeNull();
+    expect(taskServiceSpy.addTask).not.toHaveBeenCalled();
+  });
 
-    const items = fixture.nativeElement.querySelectorAll('li');
-    expect(items.length).toBe(3);
-    expect(input.value).toBe('');
+  it('should call POST (addTask) with the selected priority and close the modal on confirm', () => {
+    taskServiceSpy.addTask.and.returnValue(
+      of({ id: 3, description: 'Regar las plantas', completed: false, priority: 'alta', weekStart: thisWeek })
+    );
+
+    fixture.componentInstance.openAddModal();
+    fixture.detectChanges();
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.modal-field input');
+    input.value = 'Regar las plantas';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const priorityButtons: NodeListOf<HTMLButtonElement> =
+      fixture.nativeElement.querySelectorAll('.priority-pill');
+    const altaButton = Array.from(priorityButtons).find((b) => b.textContent?.includes('Alta'))!;
+    altaButton.click();
+    fixture.detectChanges();
+
+    const confirmButton: HTMLButtonElement = fixture.nativeElement.querySelector('.modal-footer .btn-primary');
+    expect(confirmButton.disabled).toBeFalse();
+    confirmButton.click();
+    fixture.detectChanges();
+
+    expect(taskServiceSpy.addTask).toHaveBeenCalledWith('Regar las plantas', 'alta', thisWeek);
+    expect(fixture.componentInstance.tasks.length).toBe(3);
+    expect(fixture.nativeElement.querySelector('.modal-overlay')).toBeNull();
+  });
+
+  it('should disable the confirm button while the description is empty', () => {
+    fixture.componentInstance.openAddModal();
+    fixture.detectChanges();
+
+    const confirmButton: HTMLButtonElement = fixture.nativeElement.querySelector('.modal-footer .btn-primary');
+    expect(confirmButton.disabled).toBeTrue();
   });
 
   it('should call DELETE (deleteTask) and remove the task from the list on delete click', () => {
