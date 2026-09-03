@@ -1,3 +1,3 @@
 namespace TodoApi.Models;
 
-public record CreateTaskRequest(string Description);
+public record CreateTaskRequest(string Description, string Priority = TaskPriority.Media);
