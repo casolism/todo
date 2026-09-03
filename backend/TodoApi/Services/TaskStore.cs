@@ -93,4 +93,26 @@ public class TaskStore
             return true;
         }
     }
+
+    /// <summary>Mueve las tareas pendientes de <paramref name="week"/> a la semana siguiente.</summary>
+    public int CarryOverPending(DateOnly week)
+    {
+        lock (_lock)
+        {
+            var nextWeek = week.AddDays(7);
+            var pending = _tasks.Where(t => t.WeekStart == week && !t.Completed).ToList();
+
+            foreach (var task in pending)
+            {
+                task.WeekStart = nextWeek;
+            }
+
+            if (pending.Count > 0)
+            {
+                Save();
+            }
+
+            return pending.Count;
+        }
+    }
 }

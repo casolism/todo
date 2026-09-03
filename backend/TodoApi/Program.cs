@@ -62,6 +62,18 @@ app.MapDelete("/api/tasks/{id:int}", (int id, TaskStore store) =>
     store.Delete(id) ? Results.NoContent() : Results.NotFound())
     .WithName("DeleteTask");
 
+app.MapPost("/api/tasks/carry-over", (string week, TaskStore store) =>
+{
+    if (!DateOnly.TryParse(week, out var weekDate))
+    {
+        return Results.BadRequest(new { error = "El parámetro 'week' debe ser una fecha válida (YYYY-MM-DD)." });
+    }
+
+    var moved = store.CarryOverPending(weekDate);
+    return Results.Ok(new { moved });
+})
+    .WithName("CarryOverTasks");
+
 app.Run();
 
 public partial class Program { }
