@@ -30,6 +30,7 @@ export class TaskListComponent implements OnInit {
   showAddModal = false;
   newTaskDescription = '';
   newTaskPriority: Priority = 'media';
+  taskPendingDelete: Task | null = null;
 
   constructor(private taskService: TaskService) {}
 
@@ -133,9 +134,21 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  onDelete(task: Task): void {
+  onDeleteClick(task: Task): void {
+    this.taskPendingDelete = task;
+  }
+
+  cancelDelete(): void {
+    this.taskPendingDelete = null;
+  }
+
+  confirmDelete(): void {
+    const task = this.taskPendingDelete;
+    if (!task) return;
+
     this.taskService.deleteTask(task.id).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t.id !== task.id);
+      this.taskPendingDelete = null;
     });
   }
 }

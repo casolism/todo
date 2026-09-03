@@ -110,11 +110,31 @@ describe('TaskListComponent', () => {
     expect(confirmButton.disabled).toBeTrue();
   });
 
-  it('should call DELETE (deleteTask) and remove the task from the list on delete click', () => {
+  it('should not call DELETE when the confirm modal is cancelled', () => {
+    const deleteButton: HTMLButtonElement = fixture.nativeElement.querySelector('.delete-btn');
+    deleteButton.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.modal-overlay')).not.toBeNull();
+
+    const cancelButton: HTMLButtonElement = fixture.nativeElement.querySelector('.modal-small .btn-outline');
+    cancelButton.click();
+    fixture.detectChanges();
+
+    expect(taskServiceSpy.deleteTask).not.toHaveBeenCalled();
+    expect(fixture.componentInstance.tasks.length).toBe(2);
+    expect(fixture.nativeElement.querySelector('.modal-overlay')).toBeNull();
+  });
+
+  it('should call DELETE (deleteTask) and remove the task from the list when confirmed', () => {
     taskServiceSpy.deleteTask.and.returnValue(of(undefined));
 
     const deleteButton: HTMLButtonElement = fixture.nativeElement.querySelector('.delete-btn');
     deleteButton.click();
+    fixture.detectChanges();
+
+    const confirmButton: HTMLButtonElement = fixture.nativeElement.querySelector('.modal-small .btn-danger');
+    confirmButton.click();
     fixture.detectChanges();
 
     expect(taskServiceSpy.deleteTask).toHaveBeenCalledWith(1);
@@ -122,6 +142,7 @@ describe('TaskListComponent', () => {
 
     const items = fixture.nativeElement.querySelectorAll('li');
     expect(items.length).toBe(1);
+    expect(fixture.nativeElement.querySelector('.modal-overlay')).toBeNull();
   });
 
   it('should call GET with the next week when the "next" nav button is clicked', () => {
