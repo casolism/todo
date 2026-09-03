@@ -235,4 +235,21 @@ describe('TaskListComponent', () => {
     items = fixture.nativeElement.querySelectorAll('li');
     expect(items.length).toBe(2);
   });
+
+  it('should show the empty state when the visible list has no tasks (e.g. filter with no matches)', () => {
+    expect(fixture.nativeElement.querySelector('.empty-state')).toBeNull();
+
+    // Ambas tareas están completadas o pendientes, ninguna coincide con "completadas"
+    // si forzamos que ambas estén pendientes.
+    fixture.componentInstance.tasks = [
+      { id: 1, description: 'Tarea pendiente', completed: false, priority: 'media', weekStart: thisWeek }
+    ];
+    fixture.componentInstance.setFilter('completadas');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('ul.task-list')).toBeNull();
+    const emptyState = fixture.nativeElement.querySelector('.empty-state');
+    expect(emptyState).not.toBeNull();
+    expect(emptyState.textContent).toContain('No hay tareas que coincidan con el filtro');
+  });
 });

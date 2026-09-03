@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <ul class="task-list">
+  <ul class="task-list" *ngIf="visibleTasks.length > 0">
     <li *ngFor="let task of visibleTasks" [class.completed]="task.completed">
       <input
         type="checkbox"
@@ -61,6 +61,12 @@
       <button type="button" class="delete-btn" (click)="onDeleteClick(task)" aria-label="Eliminar tarea">🗑</button>
     </li>
   </ul>
+
+  <div class="empty-state" *ngIf="visibleTasks.length === 0">
+    <div class="empty-state-icon"></div>
+    <p class="empty-state-title">{{ emptyStateTitle }}</p>
+    <p class="empty-state-message">Cambia de semana o ajusta el filtro para ver el resto de las tareas.</p>
+  </div>
 
   <div class="card-footer">
     <span class="footer-note">Las tareas pendientes de la semana se pueden pasar a la siguiente.</span>

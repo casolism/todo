@@ -278,6 +278,35 @@
   color: var(--color-danger);
 }
 
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px 40px;
+}
+
+.empty-state-icon {
+  width: 44px;
+  height: 44px;
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.empty-state-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 4px;
+}
+
+.empty-state-message {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
 .card-footer {
   display: flex;
   align-items: center;
