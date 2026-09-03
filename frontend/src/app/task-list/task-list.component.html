@@ -58,7 +58,7 @@
           {{ priorityLabel(task.priority) }}
         </span>
       </div>
-      <button type="button" class="delete-btn" (click)="onDelete(task)" aria-label="Eliminar tarea">🗑</button>
+      <button type="button" class="delete-btn" (click)="onDeleteClick(task)" aria-label="Eliminar tarea">🗑</button>
     </li>
   </ul>
 </div>
@@ -102,6 +102,17 @@
       >
         Agregar tarea
       </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="taskPendingDelete as task" (click)="cancelDelete()">
+  <div class="modal modal-small" (click)="$event.stopPropagation()">
+    <p class="modal-confirm-text">¿Eliminar <strong>{{ task.description }}</strong>?</p>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-outline" (click)="cancelDelete()">Cancelar</button>
+      <button type="button" class="btn-danger" (click)="confirmDelete()">Eliminar</button>
     </div>
   </div>
 </div>
