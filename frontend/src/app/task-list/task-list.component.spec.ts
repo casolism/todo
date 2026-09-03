@@ -202,6 +202,18 @@ describe('TaskListComponent', () => {
     expect(fill.style.width).toBe('50%');
   });
 
+  it('should call the carry-over endpoint and refresh the list', () => {
+    taskServiceSpy.carryOver.and.returnValue(of({ moved: 1 }));
+
+    const carryOverButton: HTMLButtonElement = fixture.nativeElement.querySelector('.card-footer .btn-outline');
+    carryOverButton.click();
+    fixture.detectChanges();
+
+    expect(taskServiceSpy.carryOver).toHaveBeenCalledWith(thisWeek);
+    // loadTasks() se llama una vez en ngOnInit y otra tras el carry-over.
+    expect(taskServiceSpy.getTasks).toHaveBeenCalledTimes(2);
+  });
+
   it('should show only the correct subset of tasks for each filter', () => {
     const pills: NodeListOf<HTMLButtonElement> = fixture.nativeElement.querySelectorAll('.filter-pill');
     const [todasPill, pendientesPill, completadasPill] = Array.from(pills);
