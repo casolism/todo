@@ -37,6 +37,18 @@ export class TaskListComponent implements OnInit {
     return this.currentWeekIso === toIsoDate(mondayOf(new Date()));
   }
 
+  get totalCount(): number {
+    return this.tasks.length;
+  }
+
+  get doneCount(): number {
+    return this.tasks.filter((t) => t.completed).length;
+  }
+
+  get progressPercent(): number {
+    return this.totalCount === 0 ? 0 : Math.round((this.doneCount / this.totalCount) * 100);
+  }
+
   loadTasks(): void {
     this.taskService.getTasks(this.currentWeekIso).subscribe((tasks) => (this.tasks = tasks));
   }
