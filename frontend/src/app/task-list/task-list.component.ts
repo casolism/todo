@@ -28,4 +28,14 @@ export class TaskListComponent implements OnInit {
       task.completed = updated.completed;
     });
   }
+
+  onAdd(description: string, input: HTMLInputElement): void {
+    const trimmed = description.trim();
+    if (!trimmed) return;
+
+    this.taskService.addTask(trimmed).subscribe((task) => {
+      this.tasks.push(task);
+      input.value = '';
+    });
+  }
 }

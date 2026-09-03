@@ -15,7 +15,7 @@ describe('TaskListComponent', () => {
       { id: 2, description: 'Tarea terminada', completed: true }
     ];
 
-    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'toggleTask']);
+    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'toggleTask', 'addTask']);
     taskServiceSpy.getTasks.and.returnValue(of(tasks));
 
     await TestBed.configureTestingModule({
@@ -54,5 +54,23 @@ describe('TaskListComponent', () => {
     const li = fixture.nativeElement.querySelector('li');
     expect(li.classList).toContain('completed');
     expect(checkbox.checked).toBeTrue();
+  });
+
+  it('should call POST (addTask) and add the new task to the list on submit', () => {
+    taskServiceSpy.addTask.and.returnValue(of({ id: 3, description: 'Regar las plantas', completed: false }));
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input[type="text"]');
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    input.value = 'Regar las plantas';
+    input.dispatchEvent(new Event('input'));
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(taskServiceSpy.addTask).toHaveBeenCalledWith('Regar las plantas');
+    expect(fixture.componentInstance.tasks.length).toBe(3);
+
+    const items = fixture.nativeElement.querySelectorAll('li');
+    expect(items.length).toBe(3);
+    expect(input.value).toBe('');
   });
 });

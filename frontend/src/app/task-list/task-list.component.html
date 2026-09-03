@@ -1,3 +1,8 @@
+<form class="add-task-form" (submit)="$event.preventDefault(); onAdd(descriptionInput.value, descriptionInput)">
+  <input #descriptionInput type="text" name="description" placeholder="Nueva tarea de la semana" />
+  <button type="submit">Agregar</button>
+</form>
+
 <ul class="task-list">
   <li *ngFor="let task of tasks" [class.completed]="task.completed">
     <input
