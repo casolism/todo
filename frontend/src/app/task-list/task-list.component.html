@@ -1,17 +1,34 @@
-<form class="add-task-form" (submit)="$event.preventDefault(); onAdd(descriptionInput.value, descriptionInput)">
-  <input #descriptionInput type="text" name="description" placeholder="Nueva tarea de la semana" />
-  <button type="submit">Agregar</button>
-</form>
+<div class="card">
+  <div class="week-nav">
+    <button type="button" class="nav-btn" (click)="goToPreviousWeek()" aria-label="Semana anterior">‹</button>
 
-<ul class="task-list">
-  <li *ngFor="let task of tasks" [class.completed]="task.completed">
-    <input
-      type="checkbox"
-      [checked]="task.completed"
-      [attr.data-task-id]="task.id"
-      (change)="onToggle(task)"
-    />
-    <span class="description">{{ task.description }}</span>
-    <button type="button" class="delete-btn" (click)="onDelete(task)" aria-label="Eliminar tarea">🗑</button>
-  </li>
-</ul>
+    <div class="week-label">
+      <span class="week-title">
+        Semana {{ weekNumber }}
+        <span class="current-badge" *ngIf="isCurrentWeek">Semana actual</span>
+      </span>
+      <span class="week-range">{{ weekRangeLabel }}</span>
+    </div>
+
+    <button type="button" class="nav-btn" (click)="goToNextWeek()" aria-label="Semana siguiente">›</button>
+    <button type="button" class="today-btn" (click)="goToToday()">Ir a hoy</button>
+  </div>
+
+  <form class="add-task-form" (submit)="$event.preventDefault(); onAdd(descriptionInput.value, descriptionInput)">
+    <input #descriptionInput type="text" name="description" placeholder="Nueva tarea de la semana" />
+    <button type="submit">Agregar</button>
+  </form>
+
+  <ul class="task-list">
+    <li *ngFor="let task of tasks" [class.completed]="task.completed">
+      <input
+        type="checkbox"
+        [checked]="task.completed"
+        [attr.data-task-id]="task.id"
+        (change)="onToggle(task)"
+      />
+      <span class="description">{{ task.description }}</span>
+      <button type="button" class="delete-btn" (click)="onDelete(task)" aria-label="Eliminar tarea">🗑</button>
+    </li>
+  </ul>
+</div>
