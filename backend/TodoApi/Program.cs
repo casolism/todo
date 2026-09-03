@@ -27,7 +27,15 @@ app.UseCors(AngularDevCorsPolicy);
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
     .WithName("GetHealth");
 
-app.MapGet("/api/tasks", (TaskStore store) => Results.Ok(store.GetAll()))
+app.MapGet("/api/tasks", (string? week, TaskStore store) =>
+{
+    var tasks = store.GetAll();
+    if (!string.IsNullOrEmpty(week) && DateOnly.TryParse(week, out var weekDate))
+    {
+        tasks = tasks.Where(t => t.WeekStart == weekDate).ToList();
+    }
+    return Results.Ok(tasks);
+})
     .WithName("GetTasks");
 
 app.MapPost("/api/tasks", (CreateTaskRequest request, TaskStore store) =>
@@ -37,7 +45,8 @@ app.MapPost("/api/tasks", (CreateTaskRequest request, TaskStore store) =>
         return Results.BadRequest(new { error = $"Priority inválida. Valores permitidos: {string.Join(", ", TaskPriority.Valid)}" });
     }
 
-    var task = store.Add(request.Description, request.Priority);
+    var weekStart = request.WeekStart ?? WeekUtils.GetWeekStart(DateOnly.FromDateTime(DateTime.Today));
+    var task = store.Add(request.Description, request.Priority, weekStart);
     return Results.Created($"/api/tasks/{task.Id}", task);
 })
     .WithName("CreateTask");
