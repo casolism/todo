@@ -6,6 +6,7 @@ public class TaskItem
     public string Description { get; set; } = string.Empty;
     public bool Completed { get; set; }
     public string Priority { get; set; } = TaskPriority.Media;
+    public DateOnly WeekStart { get; set; }
 }
 
 public static class TaskPriority
