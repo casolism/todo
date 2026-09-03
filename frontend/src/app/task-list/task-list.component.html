@@ -1,6 +1,11 @@
 <ul class="task-list">
   <li *ngFor="let task of tasks" [class.completed]="task.completed">
-    <input type="checkbox" [checked]="task.completed" [attr.data-task-id]="task.id" />
+    <input
+      type="checkbox"
+      [checked]="task.completed"
+      [attr.data-task-id]="task.id"
+      (change)="onToggle(task)"
+    />
     <span class="description">{{ task.description }}</span>
   </li>
 </ul>
