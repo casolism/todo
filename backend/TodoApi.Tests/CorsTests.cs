@@ -3,11 +3,11 @@ using Xunit;
 
 namespace TodoApi.Tests;
 
-public class CorsTests : IClassFixture<WebApplicationFactory<Program>>
+public class CorsTests : IClassFixture<TestAppFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly TestAppFactory _factory;
 
-    public CorsTests(WebApplicationFactory<Program> factory)
+    public CorsTests(TestAppFactory factory)
     {
         _factory = factory;
     }

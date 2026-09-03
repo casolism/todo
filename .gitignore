@@ -2,6 +2,7 @@
 backend/**/bin/
 backend/**/obj/
 backend/**/TestResults/
+backend/data/
 *.user
 
 # Node / Angular
