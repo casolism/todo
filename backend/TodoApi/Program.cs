@@ -1,10 +1,19 @@
 using TodoApi.Models;
 using TodoApi.Services;
 
+const string AngularDevCorsPolicy = "AngularDev";
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<TaskStore>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(AngularDevCorsPolicy, policy =>
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
 var app = builder.Build();
 
@@ -12,6 +21,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors(AngularDevCorsPolicy);
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
     .WithName("GetHealth");
