@@ -1,3 +1,11 @@
+<div class="app-header">
+  <div class="header-text">
+    <span class="eyebrow">Planeación semanal · Semana {{ weekNumber }}</span>
+    <h1 class="app-title">Tareas de la semana</h1>
+  </div>
+  <button type="button" class="btn-primary" (click)="openAddModal()">+ Nueva tarea</button>
+</div>
+
 <div class="card">
   <div class="week-nav">
     <button type="button" class="nav-btn" (click)="goToPreviousWeek()" aria-label="Semana anterior">‹</button>
@@ -13,11 +21,6 @@
     <button type="button" class="nav-btn" (click)="goToNextWeek()" aria-label="Semana siguiente">›</button>
     <button type="button" class="today-btn" (click)="goToToday()">Ir a hoy</button>
   </div>
-
-  <form class="add-task-form" (submit)="$event.preventDefault(); onAdd(descriptionInput.value, descriptionInput)">
-    <input #descriptionInput type="text" name="description" placeholder="Nueva tarea de la semana" />
-    <button type="submit">Agregar</button>
-  </form>
 
   <div class="progress-row">
     <div class="progress-count">
@@ -48,8 +51,57 @@
         [attr.data-task-id]="task.id"
         (change)="onToggle(task)"
       />
-      <span class="description">{{ task.description }}</span>
+      <div class="task-main">
+        <span class="description">{{ task.description }}</span>
+        <span class="priority-tag" [attr.data-priority]="task.priority">
+          <span class="priority-dot" [attr.data-priority]="task.priority"></span>
+          {{ priorityLabel(task.priority) }}
+        </span>
+      </div>
       <button type="button" class="delete-btn" (click)="onDelete(task)" aria-label="Eliminar tarea">🗑</button>
     </li>
   </ul>
+</div>
+
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2 class="modal-title">Nueva tarea</h2>
+    <p class="modal-subtitle">Se agregará a la semana {{ weekNumber }} ({{ weekRangeLabel }})</p>
+
+    <label class="modal-field">
+      Descripción
+      <input
+        #descriptionInput
+        type="text"
+        name="description"
+        placeholder="¿Qué necesitas hacer?"
+        [(ngModel)]="newTaskDescription"
+      />
+    </label>
+
+    <div class="priority-selector">
+      <button
+        type="button"
+        *ngFor="let priority of priorities"
+        class="priority-pill"
+        [class.active]="newTaskPriority === priority"
+        (click)="newTaskPriority = priority"
+      >
+        <span class="priority-dot" [attr.data-priority]="priority"></span>
+        {{ priorityLabel(priority) }}
+      </button>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-outline" (click)="closeAddModal()">Cancelar</button>
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="!newTaskDescription.trim()"
+        (click)="confirmAdd()"
+      >
+        Agregar tarea
+      </button>
+    </div>
+  </div>
 </div>

@@ -1,15 +1,22 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { Task } from '../models/task';
-
-export type TaskFilter = 'todas' | 'pendientes' | 'completadas';
+import { Priority, Task } from '../models/task';
 import { TaskService } from '../task.service';
 import { addWeeks, formatWeekRange, isoWeekNumber, mondayOf, toIsoDate } from '../date-utils';
+
+export type TaskFilter = 'todas' | 'pendientes' | 'completadas';
+
+const PRIORITY_LABELS: Record<Priority, string> = {
+  alta: 'Alta',
+  media: 'Media',
+  baja: 'Baja'
+};
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css'
 })
@@ -18,6 +25,11 @@ export class TaskListComponent implements OnInit {
   currentWeekStart: Date = mondayOf(new Date());
   activeFilter: TaskFilter = 'todas';
   readonly filters: TaskFilter[] = ['todas', 'pendientes', 'completadas'];
+
+  readonly priorities: Priority[] = ['alta', 'media', 'baja'];
+  showAddModal = false;
+  newTaskDescription = '';
+  newTaskPriority: Priority = 'media';
 
   constructor(private taskService: TaskService) {}
 
@@ -72,6 +84,10 @@ export class TaskListComponent implements OnInit {
     return { todas: 'Todas', pendientes: 'Pendientes', completadas: 'Completadas' }[filter];
   }
 
+  priorityLabel(priority: Priority): string {
+    return PRIORITY_LABELS[priority];
+  }
+
   loadTasks(): void {
     this.taskService.getTasks(this.currentWeekIso).subscribe((tasks) => (this.tasks = tasks));
   }
@@ -97,13 +113,23 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  onAdd(description: string, input: HTMLInputElement): void {
-    const trimmed = description.trim();
+  openAddModal(): void {
+    this.newTaskDescription = '';
+    this.newTaskPriority = 'media';
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  confirmAdd(): void {
+    const trimmed = this.newTaskDescription.trim();
     if (!trimmed) return;
 
-    this.taskService.addTask(trimmed, 'media', this.currentWeekIso).subscribe((task) => {
+    this.taskService.addTask(trimmed, this.newTaskPriority, this.currentWeekIso).subscribe((task) => {
       this.tasks.push(task);
-      input.value = '';
+      this.showAddModal = false;
     });
   }
 
