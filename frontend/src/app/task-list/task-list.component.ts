@@ -151,4 +151,10 @@ export class TaskListComponent implements OnInit {
       this.taskPendingDelete = null;
     });
   }
+
+  onCarryOver(): void {
+    this.taskService.carryOver(this.currentWeekIso).subscribe(() => {
+      this.loadTasks();
+    });
+  }
 }

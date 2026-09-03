@@ -61,6 +61,11 @@
       <button type="button" class="delete-btn" (click)="onDeleteClick(task)" aria-label="Eliminar tarea">🗑</button>
     </li>
   </ul>
+
+  <div class="card-footer">
+    <span class="footer-note">Las tareas pendientes de la semana se pueden pasar a la siguiente.</span>
+    <button type="button" class="btn-outline" (click)="onCarryOver()">Pasar pendientes a la próxima semana</button>
+  </div>
 </div>
 
 <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
