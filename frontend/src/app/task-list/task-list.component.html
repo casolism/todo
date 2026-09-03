@@ -12,5 +12,6 @@
       (change)="onToggle(task)"
     />
     <span class="description">{{ task.description }}</span>
+    <button type="button" class="delete-btn" (click)="onDelete(task)" aria-label="Eliminar tarea">🗑</button>
   </li>
 </ul>

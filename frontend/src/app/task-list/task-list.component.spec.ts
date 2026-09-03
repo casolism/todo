@@ -15,7 +15,7 @@ describe('TaskListComponent', () => {
       { id: 2, description: 'Tarea terminada', completed: true }
     ];
 
-    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'toggleTask', 'addTask']);
+    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'toggleTask', 'addTask', 'deleteTask']);
     taskServiceSpy.getTasks.and.returnValue(of(tasks));
 
     await TestBed.configureTestingModule({
@@ -72,5 +72,19 @@ describe('TaskListComponent', () => {
     const items = fixture.nativeElement.querySelectorAll('li');
     expect(items.length).toBe(3);
     expect(input.value).toBe('');
+  });
+
+  it('should call DELETE (deleteTask) and remove the task from the list on delete click', () => {
+    taskServiceSpy.deleteTask.and.returnValue(of(undefined));
+
+    const deleteButton: HTMLButtonElement = fixture.nativeElement.querySelector('.delete-btn');
+    deleteButton.click();
+    fixture.detectChanges();
+
+    expect(taskServiceSpy.deleteTask).toHaveBeenCalledWith(1);
+    expect(fixture.componentInstance.tasks.length).toBe(1);
+
+    const items = fixture.nativeElement.querySelectorAll('li');
+    expect(items.length).toBe(1);
   });
 });
