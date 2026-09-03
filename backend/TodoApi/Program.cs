@@ -1,3 +1,4 @@
+using TodoApi.Models;
 using TodoApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,13 @@ app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
 
 app.MapGet("/api/tasks", (TaskStore store) => Results.Ok(store.GetAll()))
     .WithName("GetTasks");
+
+app.MapPost("/api/tasks", (CreateTaskRequest request, TaskStore store) =>
+{
+    var task = store.Add(request.Description);
+    return Results.Created($"/api/tasks/{task.Id}", task);
+})
+    .WithName("CreateTask");
 
 app.Run();
 
