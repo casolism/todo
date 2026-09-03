@@ -6,11 +6,11 @@ using Xunit;
 
 namespace TodoApi.Tests;
 
-public class TasksPutTests : IClassFixture<WebApplicationFactory<Program>>
+public class TasksPutTests : IClassFixture<TestAppFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly TestAppFactory _factory;
 
-    public TasksPutTests(WebApplicationFactory<Program> factory)
+    public TasksPutTests(TestAppFactory factory)
     {
         _factory = factory;
     }
