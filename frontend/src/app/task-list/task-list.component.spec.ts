@@ -152,4 +152,26 @@ describe('TaskListComponent', () => {
     const fill: HTMLElement = fixture.nativeElement.querySelector('.progress-fill');
     expect(fill.style.width).toBe('50%');
   });
+
+  it('should show only the correct subset of tasks for each filter', () => {
+    const pills: NodeListOf<HTMLButtonElement> = fixture.nativeElement.querySelectorAll('.filter-pill');
+    const [todasPill, pendientesPill, completadasPill] = Array.from(pills);
+
+    pendientesPill.click();
+    fixture.detectChanges();
+    let items: NodeListOf<HTMLLIElement> = fixture.nativeElement.querySelectorAll('li');
+    expect(items.length).toBe(1);
+    expect(items[0].textContent).toContain('Tarea pendiente');
+
+    completadasPill.click();
+    fixture.detectChanges();
+    items = fixture.nativeElement.querySelectorAll('li');
+    expect(items.length).toBe(1);
+    expect(items[0].textContent).toContain('Tarea terminada');
+
+    todasPill.click();
+    fixture.detectChanges();
+    items = fixture.nativeElement.querySelectorAll('li');
+    expect(items.length).toBe(2);
+  });
 });
