@@ -19,6 +19,15 @@
     <button type="submit">Agregar</button>
   </form>
 
+  <div class="progress-row">
+    <div class="progress-count">
+      <span class="progress-count-text">{{ doneCount }}/{{ totalCount }} completadas</span>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    </div>
+  </div>
+
   <ul class="task-list">
     <li *ngFor="let task of tasks" [class.completed]="task.completed">
       <input

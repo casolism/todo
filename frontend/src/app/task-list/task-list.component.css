@@ -86,6 +86,42 @@
   padding: 16px 24px;
 }
 
+/* Barra de progreso y filtros */
+.progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px 16px;
+}
+
+.progress-count {
+  flex: 1;
+  max-width: 320px;
+}
+
+.progress-count-text {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 6px;
+}
+
+.progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border-soft);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+
 /* Lista de tareas */
 .task-list {
   list-style: none;

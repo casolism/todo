@@ -140,4 +140,16 @@ describe('TaskListComponent', () => {
     expect(taskServiceSpy.getTasks).toHaveBeenCalledWith(thisWeek);
     expect(fixture.nativeElement.querySelector('.current-badge')).not.toBeNull();
   });
+
+  it('should show doneCount/totalCount and a proportional progress bar for a mixed set of tasks', () => {
+    expect(fixture.componentInstance.doneCount).toBe(1);
+    expect(fixture.componentInstance.totalCount).toBe(2);
+    expect(fixture.componentInstance.progressPercent).toBe(50);
+
+    const countText: HTMLElement = fixture.nativeElement.querySelector('.progress-count-text');
+    expect(countText.textContent).toContain('1/2 completadas');
+
+    const fill: HTMLElement = fixture.nativeElement.querySelector('.progress-fill');
+    expect(fill.style.width).toBe('50%');
+  });
 });
