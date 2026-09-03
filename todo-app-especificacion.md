@@ -3,25 +3,36 @@
 ## Objetivo
 
 Aplicación simple de lista de tareas ("compromisos de la semana"): descripciones
-breves con checkbox que marca pendiente/terminada. Sin autenticación, sin
-persistencia avanzada (memoria es suficiente para esta primera versión).
+breves con checkbox que marca pendiente/terminada. Sin autenticación. La
+iteración 1 quedó en memoria; la iteración 2 (ver más abajo) migra la
+persistencia a un archivo JSON en el backend — no se justifica una base de
+datos para el volumen de tareas que maneja esta app.
 
 Sirve como proyecto de prueba para el paradigma de "looping" (`/goal`) en
 Claude Code, con Jira + GitHub como backlog y repositorio, vía MCP.
 
 ## Alcance
 
-**Incluye:**
+**Incluye (iteración 1, ya entregada):**
 - Ver lista de tareas de la semana
 - Agregar una tarea nueva (descripción breve)
 - Marcar/desmarcar una tarea como terminada (checkbox)
 - Borrar una tarea
 
-**No incluye (fuera de alcance para esta versión):**
+**Incluye (iteración 2, ver sección dedicada más abajo):**
+- Persistencia en archivo JSON (reemplaza memoria)
+- Navegación entre semanas + volver a la semana actual
+- Pasar tareas pendientes de una semana a la siguiente
+- Filtros: todas / pendientes / completadas
+- Prioridad por tarea (alta/media/baja)
+- Modal para agregar tarea (reemplaza formulario inline)
+- Modal de confirmación al eliminar
+
+**No incluye (fuera de alcance):**
 - Autenticación / usuarios
-- Persistencia en base de datos (queda en memoria del backend)
-- Edición de tareas (cambiar la descripción de una ya creada)
-- Fechas límite, prioridades, categorías
+- Base de datos
+- Edición de la descripción de una tarea ya creada
+- Fechas límite específicas, categorías
 
 ## Estructura del repositorio (monorepo)
 
@@ -34,10 +45,13 @@ todo-app/
 
 ## Stack
 
-- **Backend:** ASP.NET Core Web API (.NET), almacenamiento en memoria
+- **Backend:** ASP.NET Core Web API (.NET), persistencia en archivo JSON (ver Iteración 2)
 - **Frontend:** Angular
 
 ## Modelo de datos
+
+Modelo de la iteración 1 (ver sección "Iteración 2" más abajo para los
+campos `Priority` y `WeekStart` agregados después):
 
 ```
 TaskItem
@@ -89,6 +103,82 @@ backend ya exponga los endpoints correspondientes):
 Cada issue debe incluir su criterio de aceptación en la descripción, para que
 el loop sepa exactamente qué comando correr para validarlo.
 
+## Iteración 2 — mejoras de UI, semanas y persistencia en JSON
+
+A partir de la maquetación revisada, se agregan estos requerimientos sobre
+la app ya entregada en la iteración 1.
+
+### Modelo de datos (actualizado)
+
+```
+TaskItem
+├── Id: int
+├── Description: string
+├── Completed: bool
+├── Priority: string   ("alta" | "media" | "baja")
+└── WeekStart: date     (lunes de la semana ISO a la que pertenece la tarea)
+```
+
+### Persistencia
+
+El backend deja de guardar las tareas en memoria y las persiste en un
+archivo `tasks.json` en disco (por ejemplo `backend/data/tasks.json`).
+No se usa base de datos — el volumen esperado (tareas de una semana a la
+vez) no lo justifica. Cada mutación (crear, togglear, borrar, carry-over)
+se escribe inmediatamente al archivo; al arrancar, el backend carga el
+archivo si existe o lo crea vacío si no.
+
+### Backend — endpoints (actualizado)
+
+| Endpoint | Descripción |
+|---|---|
+| `GET /api/health` | Healthcheck, responde 200 |
+| `GET /api/tasks?week={YYYY-MM-DD}` | Lista tareas de la semana cuyo lunes es la fecha dada |
+| `POST /api/tasks` | Crea tarea (`{ description, priority, weekStart }`) |
+| `PUT /api/tasks/{id}` | Togglea `Completed` |
+| `DELETE /api/tasks/{id}` | Elimina una tarea |
+| `POST /api/tasks/carry-over?week={YYYY-MM-DD}` | Mueve las tareas pendientes de esa semana a la siguiente (actualiza su `WeekStart`) |
+
+### Frontend — comportamiento nuevo
+
+> Referencia visual obligatoria: `design-notes.md` (colores, tipografía,
+> layout y detalle de cada componente extraídos de la maqueta). Debe
+> vivir en la raíz del repo — el loop de ejecución lo necesita para las
+> historias 16-22.
+
+- Encabezado con navegación: botones semana anterior/siguiente, etiqueta de
+  la semana (ej. "3-9 nov") y badge "Semana actual" cuando corresponde.
+  Botón "Ir a hoy" que regresa a la semana en curso.
+- Contador de completadas (`{{ doneCount }}/{{ totalCount }}`) con barra de
+  progreso.
+- Filtros tipo pill: Todas / Pendientes / Completadas, sobre la lista visible.
+- "Nueva tarea" abre un modal (ya no formulario inline) con campo de
+  descripción y selector de prioridad (alta/media/baja).
+- Botón "Pasar pendientes a la próxima semana" que llama al endpoint de
+  carry-over.
+- Al eliminar una tarea, se pide confirmación en un modal antes de llamar
+  `DELETE`.
+- Estado vacío con mensaje cuando la semana/filtro no tiene tareas que mostrar.
+
+### Backlog — historias para Jira (iteración 2)
+
+| # | Historia | Criterio de aceptación (check automático) |
+|---|---|---|
+| 12 | Migrar persistencia de memoria a archivo `tasks.json` | Test: reiniciar el proceso y las tareas previas siguen en `GET /api/tasks` |
+| 13 | Agregar campo `Priority` al modelo + `POST /api/tasks` lo acepta | Test: `POST` con priority inválida devuelve 400, válida devuelve 201 |
+| 14 | Agregar campo `WeekStart` + `GET /api/tasks?week=` filtra por semana | Test: tareas de otras semanas no aparecen en la respuesta |
+| 15 | `POST /api/tasks/carry-over?week=` — mueve pendientes a la semana siguiente | Test: tarea pendiente cambia de `WeekStart`, tarea completada no se mueve |
+| 16 | Navegación entre semanas (prev/next) + "Ir a hoy" en el frontend | Test de componente: click en next llama `GET` con la semana siguiente |
+| 17 | Contador de completadas + barra de progreso | Test de componente: refleja `doneCount`/`totalCount` correctos |
+| 18 | Filtros Todas/Pendientes/Completadas | Test de componente: cada filtro muestra el subconjunto correcto |
+| 19 | Modal "Nueva tarea" con selector de prioridad (reemplaza formulario inline) | Test de componente: abre, envía `POST` con priority, cierra al confirmar |
+| 20 | Modal de confirmación al eliminar tarea | Test de componente: `DELETE` solo se llama tras confirmar en el modal |
+| 21 | Botón "Pasar pendientes a la próxima semana" en frontend | Test de componente: llama al endpoint de carry-over y refresca la lista |
+| 22 | Estado vacío (semana o filtro sin tareas) | Test de componente: muestra mensaje cuando la lista visible está vacía |
+
+Igual que en la iteración 1: cada issue necesita su criterio de aceptación
+en la descripción antes de pasar por el loop de refinamiento.
+
 ## Fase intermedia — afinar especificación de cada issue (loop de refinamiento)
 
 Antes de lanzar el loop de desarrollo, cada issue del backlog debe pasar por
@@ -127,7 +217,7 @@ Sale con código 0 si está listo, 1 si falta algo (con el detalle impreso).
 ### Comando `/goal` — refinamiento
 
 ```
-/goal Afina la descripción de cada issue del proyecto [LDT] que no
+/goal Afina la descripción de cada issue del proyecto LDT que no
 tenga el label "spec-ready" (usa mcp-jira para leer y actualizar issues).
 Usa todo-app-especificacion.md como contexto general del proyecto. Para
 cada issue: redacta su descripción incluyendo las secciones Contexto,
@@ -151,16 +241,18 @@ revisión rápida (ya no de redacción desde cero) pero sigue siendo tuya.
 Una vez creado y revisado el backlog en Jira:
 
 ```
-/goal Trabaja los issues con label "spec-ready" del proyecto [LDT]
+/goal Trabaja los issues con label "spec-ready" del proyecto LDT
 en orden de prioridad, uno a la vez (usa mcp-jira para leer/actualizar
-issues y su integración con GitHub para ramas y PRs). Para cada issue:
-crea una rama, implementa el cambio en backend/ o frontend/ según
-corresponda, corre el comando de verificación indicado en la descripción
-del issue, y solo si pasa: haz commit, abre un PR contra main, y mueve
-el issue a "Done" en Jira con un comentario del PR. Si el check falla,
-itera sobre el mismo issue sin pasar al siguiente. No mergees ningún PR
-tú mismo. Detente cuando no queden issues con spec-ready abiertos, o
-tras 40 turnos.
+issues y su integración con GitHub para ramas y PRs). Para issues de
+frontend, usa design-notes.md como referencia visual obligatoria (colores,
+tipografía, layout de cada componente) — no improvises estilos que no
+estén ahí. Para cada issue: crea una rama, implementa el cambio en
+backend/ o frontend/ según corresponda, corre el comando de verificación
+indicado en la descripción del issue, y solo si pasa: haz commit, abre
+un PR contra main, y mueve el issue a "Done" en Jira con un comentario
+del PR. Si el check falla, itera sobre el mismo issue sin pasar al
+siguiente. No mergees ningún PR tú mismo. Detente cuando no queden
+issues con spec-ready abiertos, o tras 40 turnos.
 ```
 
 **Nota:** el merge de PRs se deja manual a propósito en esta primera prueba,
