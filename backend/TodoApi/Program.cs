@@ -33,6 +33,10 @@ app.MapPut("/api/tasks/{id:int}", (int id, TaskStore store) =>
 })
     .WithName("ToggleTask");
 
+app.MapDelete("/api/tasks/{id:int}", (int id, TaskStore store) =>
+    store.Delete(id) ? Results.NoContent() : Results.NotFound())
+    .WithName("DeleteTask");
+
 app.Run();
 
 public partial class Program { }
