@@ -26,6 +26,13 @@ app.MapPost("/api/tasks", (CreateTaskRequest request, TaskStore store) =>
 })
     .WithName("CreateTask");
 
+app.MapPut("/api/tasks/{id:int}", (int id, TaskStore store) =>
+{
+    var task = store.ToggleCompleted(id);
+    return task is null ? Results.NotFound() : Results.Ok(task);
+})
+    .WithName("ToggleTask");
+
 app.Run();
 
 public partial class Program { }
