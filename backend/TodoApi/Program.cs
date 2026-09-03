@@ -32,7 +32,12 @@ app.MapGet("/api/tasks", (TaskStore store) => Results.Ok(store.GetAll()))
 
 app.MapPost("/api/tasks", (CreateTaskRequest request, TaskStore store) =>
 {
-    var task = store.Add(request.Description);
+    if (!TaskPriority.Valid.Contains(request.Priority))
+    {
+        return Results.BadRequest(new { error = $"Priority inválida. Valores permitidos: {string.Join(", ", TaskPriority.Valid)}" });
+    }
+
+    var task = store.Add(request.Description, request.Priority);
     return Results.Created($"/api/tasks/{task.Id}", task);
 })
     .WithName("CreateTask");

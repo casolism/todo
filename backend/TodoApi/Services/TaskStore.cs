@@ -50,11 +50,11 @@ public class TaskStore
         }
     }
 
-    public TaskItem Add(string description)
+    public TaskItem Add(string description, string priority)
     {
         lock (_lock)
         {
-            var task = new TaskItem { Id = _nextId++, Description = description, Completed = false };
+            var task = new TaskItem { Id = _nextId++, Description = description, Completed = false, Priority = priority };
             _tasks.Add(task);
             Save();
             return task;
