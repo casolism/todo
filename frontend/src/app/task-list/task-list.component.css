@@ -1,0 +1,16 @@
+.task-list {
+  list-style: none;
+  padding: 0;
+}
+
+.task-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.task-list li.completed .description {
+  text-decoration: line-through;
+  color: #888;
+}
